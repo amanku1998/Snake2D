@@ -9,25 +9,19 @@ public class FoodManager : MonoBehaviour
 
     private SnakeController snake;
 
-    public float foodLifeSpan = 15f; // Time before food auto-destroys
-    public GameObject currentFood; // Track the active food
+    [SerializeField] private float foodLifeSpan = 15f; // Time before food auto-destroys
+    private GameObject currentFood; // Track the active food
     private int spawnCounter = 0; // Track the number of food spawns
+    public Coroutine currentCoroutine;
 
     [Header("Power-Up Settings")]
+
     [SerializeField] private float powerUpSpawnIntervalMin = 15f;
     [SerializeField] private float powerUpSpawnIntervalMax = 25f;
 
-    public GameObject currentPowerUp; // Track the active power-up
-    //private bool lastFoodWasMassGainer = true; // Track the type of the last food
+    private GameObject currentPowerUp; // Track the active power-up
     [SerializeField] private GameObject[] powerUpPrefabs;
 
-
-    public Coroutine currentCoroutine;
-
-    private string activePowerUpType = ""; // Track the currently active power-up type
-    public bool isPowerUpEffectActive = false; // Track if a power-up effect is active
-
-    [Header("Power-Ups")]
     [SerializeField] private float shieldDuration = 3f;
     [SerializeField] private float scoreBoostDuration = 3f;
     [SerializeField] private float speedBoostDuration = 10f;
@@ -35,6 +29,9 @@ public class FoodManager : MonoBehaviour
     private bool isShieldActive = false;
     private bool isScoreBoostActive = false;
     private bool isSpeedBoostActive = false;
+
+    private string activePowerUpType = ""; // Track the currently active power-up type
+    private bool isPowerUpEffectActive = false; // Track if a power-up effect is active
 
     private void Awake()
     {
@@ -44,7 +41,6 @@ public class FoodManager : MonoBehaviour
     private void Start()
     {
         SpawnFoodRandomly();
-
         StartCoroutine(SpawnPowerUps());
     }
 
@@ -77,19 +73,14 @@ public class FoodManager : MonoBehaviour
         while (snake.Occupies((int)newPosition.x, (int)newPosition.y));
 
         bool isMassGainer;
-
-        if (spawnCounter < 3)
+        if (spawnCounter < 4)
         {
             // Ensure the first three spawns are always Mass Gainers
             isMassGainer = true;
         }
         else
         {
-            // Determine isMassGainer value randomly
-            // Determine isMassGainer value with weighted probability
-            //bool randomIsMassGainer = Random.Range(0, 10) < 8; // 70% chance for true (mass gainer), 20% chance for false (mass burner)
             isMassGainer = Random.Range(0, 10) < 8; // 70% chance for true (mass gainer), 20% chance for false (mass burner)
-
         }
         // Select the appropriate prefab based on isMassGainer value
         //GameObject selectedPrefab = randomIsMassGainer ? FoodPrefabs[0] : FoodPrefabs[1];
@@ -102,6 +93,7 @@ public class FoodManager : MonoBehaviour
         Food foodComponent = currentFood.GetComponent<Food>();
         // Assign the isMassGainer value to the instantiated food
         foodComponent.SetFoodType(isMassGainer);
+        //spawnCounter++;
     }
 
     public void StopFoodSpawnCoroutine()
@@ -215,6 +207,10 @@ public class FoodManager : MonoBehaviour
     {
         currentPowerUp = null; // Clear reference when collected
     }
+
+    public int GetSpawnCounterVal() { return spawnCounter; }
+
+    public void IncreaseSpawnCounterVal() { spawnCounter += 1; }
 
     public float GetShieldDuration()    {   return shieldDuration;  }
 

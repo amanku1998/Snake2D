@@ -8,16 +8,6 @@ public class Food : MonoBehaviour
     private FoodManager foodManager;
     private bool isMassGainer;
 
-    public bool GetFoodType()
-    {
-        return isMassGainer;
-    }
-
-    public void SetFoodType(bool massGainer)
-    {
-        isMassGainer = massGainer;
-    }
-
     private void Awake()
     {
         //snake = FindObjectOfType<SnakeController>();
@@ -42,4 +32,7 @@ public class Food : MonoBehaviour
         }
         foodManager.SpawnFoodRandomly();
     }
+
+    public bool GetFoodType() { return isMassGainer; }
+    public void SetFoodType(bool massGainer) { isMassGainer = massGainer; }
 }
