@@ -8,6 +8,8 @@ TagManager:
   - Wall
   - Food
   - PowerUp
+  - MassGainer
+  - MassBurner
   layers:
   - Default
   - TransparentFX

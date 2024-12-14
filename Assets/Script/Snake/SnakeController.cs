@@ -6,7 +6,7 @@ public class SnakeController : MonoBehaviour
 {
     [SerializeField] private Transform segmentPrefab;
     [SerializeField] private Vector2Int direction = Vector2Int.right;
-    [SerializeField] private float speed = 20f;
+    [SerializeField] private float speed = 10f;
     [SerializeField] private float speedMultiplier = 1f;
     [SerializeField] private int initialSize = 4;
     [SerializeField] private bool moveThroughWalls = false;
@@ -15,15 +15,24 @@ public class SnakeController : MonoBehaviour
     private Vector2Int input;
     private float nextUpdate;
 
-    [Header("Power-Ups")]
-    [SerializeField] private float shieldDuration = 3f;
-    [SerializeField] private float scoreBoostDuration = 3f;
-    [SerializeField] private float speedBoostDuration = 3f;
-    private bool isShieldActive = false;
-    private bool isScoreBoostActive = false;
-    private bool isSpeedBoostActive = false;
+    [SerializeField] private FoodManager foodManager;
 
     private float defaultSpeedMultiplier;
+
+    public void SetSpeed(float _speed)
+    {
+        speed = _speed;
+    }
+    
+    public float GetSpeed()
+    {
+        return speed;
+    }
+
+    public float GetDefaultSpeed()
+    {
+        return defaultSpeedMultiplier;
+    }
 
     public List<Transform> GetSegmentOfSnakeBodyPartList()
     {
@@ -33,7 +42,7 @@ public class SnakeController : MonoBehaviour
     private void Start()
     {
         ResetState();
-        defaultSpeedMultiplier = speedMultiplier;
+        defaultSpeedMultiplier = speed;
     }
 
     private void Update()
@@ -110,8 +119,6 @@ public class SnakeController : MonoBehaviour
         Transform segment = Instantiate(segmentPrefab);
         segment.position = segmentOfSnakeBodyPartList[segmentOfSnakeBodyPartList.Count - 1].position;
         segmentOfSnakeBodyPartList.Add(segment);
-
-        ScoreManager.Instance.AddScore(10);
     }
 
     public void Shrink(int amount)
@@ -123,8 +130,6 @@ public class SnakeController : MonoBehaviour
                 Transform lastSegment = segmentOfSnakeBodyPartList[segmentOfSnakeBodyPartList.Count - 1];
                 segmentOfSnakeBodyPartList.Remove(lastSegment);
                 Destroy(lastSegment.gameObject);
-
-                ScoreManager.Instance.ReduceScore(10);
             }
         }
     }
@@ -166,38 +171,64 @@ public class SnakeController : MonoBehaviour
         if (other.gameObject.CompareTag("Food"))
         {
             //Grow();
+            //Food food = other.GetComponent<Food>();
             Food food = other.GetComponent<Food>();
 
             if (food != null)
             {
-                if (food.isMassGainer)
+                ScoreManager scoreManager = ScoreManager.Instance;
+
+                if (food.GetFoodType() == true)
                 {
+                    Debug.Log("isScoreBoostActive :"+ foodManager.GetIsScoreBoostActive());
+                    if (foodManager.GetIsScoreBoostActive())
+                    {
+                        //Increase score at double rate
+                        int increasedScore = scoreManager.GetScoreVal(); 
+                        int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal(); 
+                        scoreManager.AddScore(increasedScore * scoreMultiplier);
+                    }
+                    else
+                    {
+                        int scoreVal = scoreManager.GetScoreVal();
+                        Debug.Log("ScoreVal :" + scoreVal);
+                        scoreManager.AddScore(scoreVal);
+                    }
+                    
                     Grow();
                 }
-                else if (food.isMassGainer == false)
+                else if (food.GetFoodType() == false)
                 {
-                    Shrink(food.lengthChangeAmount);
+                    scoreManager.ReduceScore(scoreManager.GetScoreVal());
+                    //Shrink(food.lengthChangeAmount);
+                    Shrink(1);
                 }
             }
 
-            if (isScoreBoostActive)
-            {
-                // Example: Double points logic here
 
-            }
         }
         else if (other.gameObject.CompareTag("PowerUp"))
         {
             PowerUpController powerUp = other.GetComponent<PowerUpController>();
             if (powerUp != null)
             {
-                ActivatePowerUp(powerUp.powerUpType);
+                // Prevent duplicate calls using a flag
+                if (!powerUp.HasBeenActivated)
+                {
+                    powerUp.HasBeenActivated = true; // Mark as processed
+                    Debug.Log("powerUpType :" + powerUp.powerUpType.ToString());
+                    //To do it is called twice which causes issue
+                    //ActivatePowerUp(powerUp.powerUpType.ToString());
+                    foodManager.ApplyPowerUpEffect(powerUp.powerUpType);
+                    //foodManager.ActivatePowerUp(powerUp.powerUpType);
+
+                    Destroy(other.gameObject);
+                }
             }
-            Destroy(other.gameObject);
         }
         else if (other.gameObject.CompareTag("Obstacle"))
         {
-            if (!isShieldActive)
+            if (!foodManager.GetIsShieldActive())
             {
                 ResetState();
             }
@@ -208,7 +239,7 @@ public class SnakeController : MonoBehaviour
             {
                 Traverse(other.transform);
             }
-            else if (!isShieldActive)
+            else if (!foodManager.GetIsShieldActive())
             {
                 ResetState();
             }
@@ -229,49 +260,5 @@ public class SnakeController : MonoBehaviour
         }
 
         transform.position = position;
-    }
-
-
-    // Rest of the existing methods ...
-
-    public void ActivatePowerUp(string powerUpType)
-    {
-        switch (powerUpType)
-        {
-            case "Shield":
-                StartCoroutine(ActivateShield());
-                break;
-
-            case "ScoreBoost":
-                StartCoroutine(ActivateScoreBoost());
-                break;
-
-            case "SpeedUp":
-                StartCoroutine(ActivateSpeedBoost());
-                break;
-        }
-    }
-
-    private IEnumerator ActivateShield()
-    {
-        isShieldActive = true;
-        yield return new WaitForSeconds(shieldDuration);
-        isShieldActive = false;
-    }
-
-    private IEnumerator ActivateScoreBoost()
-    {
-        isScoreBoostActive = true;
-        yield return new WaitForSeconds(scoreBoostDuration);
-        isScoreBoostActive = false;
-    }
-
-    private IEnumerator ActivateSpeedBoost()
-    {
-        isSpeedBoostActive = true;
-        speedMultiplier *= 1.5f; // Adjust multiplier as needed
-        yield return new WaitForSeconds(speedBoostDuration);
-        speedMultiplier = defaultSpeedMultiplier;
-        isSpeedBoostActive = false;
     }
 }

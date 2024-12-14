@@ -11,6 +11,9 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreText; // Reference to the UI Text element
     private int currentScore = 0; // Player's current score
 
+    [SerializeField] private int scoreVal = 5;
+    [SerializeField] private int increamentScoreMultiplier = 2;
+
     private void Awake()
     {
         // Singleton pattern
@@ -22,6 +25,16 @@ public class ScoreManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public int GetScoreVal()
+    {
+        return scoreVal;
+    }
+
+    public int GetIncreamentScoreMultiplierVal()
+    {
+        return increamentScoreMultiplier;
     }
 
     private void Start()
