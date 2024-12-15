@@ -19,26 +19,6 @@ public class SnakeController : MonoBehaviour
 
     private float defaultSpeedMultiplier;
 
-    public void SetSpeed(float _speed)
-    {
-        speed = _speed;
-    }
-    
-    public float GetSpeed()
-    {
-        return speed;
-    }
-
-    public float GetDefaultSpeed()
-    {
-        return defaultSpeedMultiplier;
-    }
-
-    public List<Transform> GetSegmentOfSnakeBodyPartList()
-    {
-        return segmentOfSnakeBodyPartList;
-    }
-
     private void Start()
     {
         ResetState();
@@ -58,18 +38,6 @@ public class SnakeController : MonoBehaviour
             {
                 input = Vector2Int.down;
             }      
-            else if (Input.GetKeyDown(KeyCode.L))
-            {
-                Shrink(1);
-            }
-            else if (Input.GetKeyDown(KeyCode.I))
-            {
-                ScoreManager.Instance.AddScore(10);
-            }
-            else if (Input.GetKeyDown(KeyCode.D))
-            {
-                ScoreManager.Instance.ReduceScore(10);
-            }
         }
         // Only allow turning left or right while moving in the y-axis
         else if (direction.y != 0f)
@@ -170,17 +138,15 @@ public class SnakeController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Food"))
         {
-            //Grow();
-            //Food food = other.GetComponent<Food>();
             Food food = other.GetComponent<Food>();
-
             if (food != null)
             {
                 ScoreManager scoreManager = ScoreManager.Instance;
-
+                //Check if food is mass gainer
                 if (food.GetFoodType() == true)
                 {
                     Debug.Log("isScoreBoostActive :"+ foodManager.GetIsScoreBoostActive());
+                    //Check if snake get double score
                     if (foodManager.GetIsScoreBoostActive())
                     {
                         //Increase score at double rate
@@ -194,18 +160,17 @@ public class SnakeController : MonoBehaviour
                         Debug.Log("ScoreVal :" + scoreVal);
                         scoreManager.AddScore(scoreVal);
                     }
-                    
+
+                    foodManager.IncreaseSpawnCounterVal();
                     Grow();
                 }
-                else if (food.GetFoodType() == false)
+                else if (food.GetFoodType() == false)   ////Check if food is mass burner
                 {
                     scoreManager.ReduceScore(scoreManager.GetScoreVal());
-                    //Shrink(food.lengthChangeAmount);
+                    
                     Shrink(1);
                 }
             }
-
-
         }
         else if (other.gameObject.CompareTag("PowerUp"))
         {
@@ -216,21 +181,17 @@ public class SnakeController : MonoBehaviour
                 if (!powerUp.HasBeenActivated)
                 {
                     powerUp.HasBeenActivated = true; // Mark as processed
-                    Debug.Log("powerUpType :" + powerUp.powerUpType.ToString());
-                    //To do it is called twice which causes issue
-                    //ActivatePowerUp(powerUp.powerUpType.ToString());
+                    //Debug.Log("powerUpType :" + powerUp.powerUpType.ToString());
                     foodManager.ApplyPowerUpEffect(powerUp.powerUpType);
-                    //foodManager.ActivatePowerUp(powerUp.powerUpType);
-
                     Destroy(other.gameObject);
                 }
             }
         }
         else if (other.gameObject.CompareTag("Obstacle"))
         {
-            if (!foodManager.GetIsShieldActive())
-            {
-                ResetState();
+            if (!foodManager.GetIsShieldActive()){
+                //ResetState();
+                GameManager.Instance.DisplayGameOverPanel();
             }
         }
         else if (other.gameObject.CompareTag("Wall"))
@@ -241,7 +202,8 @@ public class SnakeController : MonoBehaviour
             }
             else if (!foodManager.GetIsShieldActive())
             {
-                ResetState();
+                //ResetState();
+                GameManager.Instance.DisplayGameOverPanel();
             }
         }
     }
@@ -249,7 +211,6 @@ public class SnakeController : MonoBehaviour
     private void Traverse(Transform wall)
     {
         Vector3 position = transform.position;
-
         if (direction.x != 0f)
         {
             position.x = Mathf.RoundToInt(-wall.position.x + direction.x);
@@ -258,7 +219,12 @@ public class SnakeController : MonoBehaviour
         {
             position.y = Mathf.RoundToInt(-wall.position.y + direction.y);
         }
-
         transform.position = position;
     }
+
+    public void SetSpeed(float _speed) { speed = _speed; }
+    public float GetSpeed() { return speed; }
+    public float GetSnakeDefaultSize() { return initialSize; }
+    public float GetDefaultSpeed() { return defaultSpeedMultiplier; }
+    public List<Transform> GetSegmentOfSnakeBodyPartList() { return segmentOfSnakeBodyPartList; }
 }

@@ -14,25 +14,8 @@ public class PowerUpController : MonoBehaviour
             SnakeController snake = collision.GetComponent<SnakeController>();
             if (snake != null)
             {
-                //snake.ActivatePowerUp(powerUpType);
-                //FoodManager food = FindObjectOfType<FoodManager>();
-                //if (food != null)
-                //{
-                //    food.ClearCurrentPowerUp();
-                //}
-
-                // Activate the power-up in the FoodManager
-                FoodManager foodManager = FindObjectOfType<FoodManager>();
-                //foodManager.ActivatePowerUp(powerUpType);
-
                 Destroy(gameObject); // Remove the power-up after collection
             }
         }
     }
-
-    //public void ResetPowerUpValue()
-    //{
-    //    HasBeenActivated = false;
-    //}
-
 }
