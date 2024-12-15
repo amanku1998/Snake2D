@@ -26,7 +26,7 @@ public class MenuManager : MonoBehaviour
     
     private void PlayMultiPlayerMode()
     {
-        //SceneManager.LoadScene(1);
+        SceneManager.LoadScene(2);
     }
 
     private void QuitGame()

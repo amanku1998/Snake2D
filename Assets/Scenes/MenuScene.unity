@@ -3512,7 +3512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SingleModeButton: {fileID: 238016542}
-  MultiPlayerModeButton: {fileID: 0}
+  MultiPlayerModeButton: {fileID: 628457934}
   QuitButton: {fileID: 259204514}
 --- !u!1 &1497208158
 GameObject:
