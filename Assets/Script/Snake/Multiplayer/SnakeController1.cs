@@ -25,6 +25,10 @@ public class SnakeController1 : MonoBehaviour
     private float defaultSpeedMultiplier;
     [SerializeField] private KeyCode upKey, downKey, leftKey, rightKey; // Controls for the player
 
+    private bool isShieldActive = false;
+    private bool isScoreBoostActive = false;
+    private bool isSpeedBoostActive = false;
+
     private void Awake()
     {
         ResetState();
@@ -161,14 +165,13 @@ public class SnakeController1 : MonoBehaviour
                 //Check if food is mass gainer
                 if (food.GetFoodType() == true)
                 {
-                    Debug.Log("isScoreBoostActive :"+ foodManager.GetIsScoreBoostActive());
                     //Check if snake get double score
-                    if (foodManager.GetIsScoreBoostActive())
+                    if (isScoreBoostActive)
                     {
                         //Increase score at double rate
-                        int increasedScore = scoreManager.GetScoreVal(); 
-                        int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal(); 
-                        scoreManager.AddScore(increasedScore * scoreMultiplier , this);
+                        int increasedScore = scoreManager.GetScoreVal();
+                        int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal();
+                        scoreManager.AddScore(increasedScore * scoreMultiplier, this);
                     }
                     else
                     {
@@ -204,7 +207,8 @@ public class SnakeController1 : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Obstacle") )
         {
-            if (!foodManager.GetIsShieldActive()){
+            if (!isShieldActive)
+            {
                 GameManagerMultiplayer.Instance.DisplayGameOverPanel();
             }
         }
@@ -214,7 +218,7 @@ public class SnakeController1 : MonoBehaviour
             {
                 Traverse(other.transform);
             }
-            else if (!foodManager.GetIsShieldActive())
+            else if (!isShieldActive)
             {
                 GameManagerMultiplayer.Instance.DisplayGameOverPanel();
             }
@@ -240,4 +244,10 @@ public class SnakeController1 : MonoBehaviour
     public float GetSnakeDefaultSize() { return initialSize; }
     public float GetDefaultSpeed() { return defaultSpeedMultiplier; }
     public List<Transform> GetSegmentOfSnakeBodyPartList() { return segmentOfSnakeBodyPartList; }
+    public bool GetIsShieldActive() { return isShieldActive; }
+    public void SetIsShieldActive(bool isActive) {  isShieldActive = isActive; }
+    public bool GetIsScoreBoostActive() { return isScoreBoostActive; }
+    public void SetIsScoreBoostActive(bool isActive) { isScoreBoostActive = isActive; }
+    public bool GetIsSpeedBoostActive() { return isSpeedBoostActive; }
+    public void SetIsSpeedBoostActive(bool isActive) { isSpeedBoostActive = isActive; }
 }

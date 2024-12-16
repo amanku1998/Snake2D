@@ -31,10 +31,6 @@ public class FoodManager1 : MonoBehaviour
     [SerializeField] private float scoreBoostDuration = 3f;
     [SerializeField] private float speedBoostDuration = 10f;
 
-    private bool isShieldActive = false;
-    private bool isScoreBoostActive = false;
-    private bool isSpeedBoostActive = false;
-
     private string activePowerUpType = ""; // Track the currently active power-up type
     private bool isPowerUpEffectActive = false; // Track if a power-up effect is active
 
@@ -186,6 +182,8 @@ public class FoodManager1 : MonoBehaviour
         isPowerUpEffectActive = false;
         activePowerUpType = ""; // Clear the active power-up type
         ClearCurrentPowerUp();
+
+        DeactivateCurrentSelectedPowerIcon();
     }
 
     public void ApplyPowerUpEffect(string powerUpType, SnakeController1 snake)
@@ -220,62 +218,33 @@ public class FoodManager1 : MonoBehaviour
     public float GetShieldDuration() { return shieldDuration; }
     public float GetScoreBoostDuration() { return scoreBoostDuration; }
     public float GetSpeedBoostDuration() { return speedBoostDuration; }
-    public bool GetIsShieldActive() { return isShieldActive; }
-    public bool GetIsScoreBoostActive() { return isScoreBoostActive; }
-    public bool GetIsSpeedBoostActive() { return isSpeedBoostActive; }
 
     private IEnumerator ActivateShield(SnakeController1 snake)
     {
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            isShieldActive = true;   // Add method in SnakeController1 to handle shield
-        }
-
+        snake.SetIsShieldActive(true);
         yield return new WaitForSeconds(GetShieldDuration());
-
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            isShieldActive = false;  // Deactivate shield
-        }
-
+        snake.SetIsShieldActive(false);
         ResetPowerUpVariables();
     }
 
     private IEnumerator ActivateScoreBoost(SnakeController1 snake)
     {
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            isScoreBoostActive = true;
-        }
-
+        snake.SetIsScoreBoostActive(true);
         yield return new WaitForSeconds(GetScoreBoostDuration());
-
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            isScoreBoostActive = false;
-        }
-
+        snake.SetIsScoreBoostActive(false);
         ResetPowerUpVariables();
     }
 
     private IEnumerator ActivateSpeedBoost(SnakeController1 snake)
     {
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            isSpeedBoostActive = true;
-            float curSnakeSpeed = snake.GetSpeed();
-            snake.SetSpeed(curSnakeSpeed * 1.5f); // Adjust multiplier as needed
-
-            Debug.Log("Increase speed :" + snake.GetSpeed());
-        }
+        snake.SetIsSpeedBoostActive(true);
+        float curSnakeSpeed = snake.GetSpeed();
+        snake.SetSpeed(curSnakeSpeed * 1.5f); // Adjust multiplier as needed
 
         yield return new WaitForSeconds(GetSpeedBoostDuration());
 
-        if (snake.tag == "Snake1" || snake.tag == "Snake2")
-        {
-            snake.SetSpeed(snake.GetDefaultSpeed());
-            isSpeedBoostActive = false;
-        }
+        snake.SetSpeed(snake.GetDefaultSpeed());
+        snake.SetIsSpeedBoostActive(false);
 
         ResetPowerUpVariables();
     }
