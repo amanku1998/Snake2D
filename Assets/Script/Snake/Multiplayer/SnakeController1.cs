@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnakeController : MonoBehaviour
+public class SnakeController1 : MonoBehaviour
 {
+    public Transform targetGameObject; // The GameObject whose position you want to assign to the snake
+    public string playerID; // "Player1" or "Player2"
     [SerializeField] private float speed = 10f;
     [SerializeField] private float speedMultiplier = 1f;
     [SerializeField] private int initialSize = 4;
@@ -19,40 +21,47 @@ public class SnakeController : MonoBehaviour
     private Vector2Int input = Vector2Int.zero;
     private float nextUpdate;
 
-    [SerializeField] private FoodManager foodManager;
+    [SerializeField] private FoodManager1 foodManager;
     private float defaultSpeedMultiplier;
+    [SerializeField] private KeyCode upKey, downKey, leftKey, rightKey; // Controls for the player
 
-    private void Start()
+    private void Awake()
     {
         ResetState();
         defaultSpeedMultiplier = speed;
     }
 
+    private void Start()
+    {
+        ////Move the snake in the direction it is facing if no target is set
+        int x = Mathf.RoundToInt(targetGameObject.position.x);
+        int y = Mathf.RoundToInt(targetGameObject.position.y);
+        transform.position = new Vector2(x, y);
+    }
+
     private void Update()
     {
-        // Only allow turning up or down while moving in the x-axis
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        // Prevent turning back on itself
         if (direction.x != 0f)
         {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                input = Vector2Int.up;
-            }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                input = Vector2Int.down;
-            }
+            if (Input.GetKeyDown(upKey)) { input = Vector2Int.up; }
+            else if (Input.GetKeyDown(downKey)) { input = Vector2Int.down; }
         }
-        // Only allow turning left or right while moving in the y-axis
         else if (direction.y != 0f)
         {
-            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                input = Vector2Int.right;
-            }
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                input = Vector2Int.left;
-            }
+            if (Input.GetKeyDown(leftKey)) { input = Vector2Int.left; }
+            else if (Input.GetKeyDown(rightKey)) { input = Vector2Int.right; }
+        }
+
+        // Update direction
+        if (input != Vector2Int.zero)
+        {
+            direction = input;
         }
     }
 
@@ -75,8 +84,8 @@ public class SnakeController : MonoBehaviour
         {
             segmentOfSnakeBodyPartList[i].position = segmentOfSnakeBodyPartList[i - 1].position;
         }
-        // Move the snake in the direction it is facing
-        // Round the values to ensure it aligns to the grid
+        //// Round the values to ensure it aligns to the grid
+        // Move the snake in the direction it is facing if no target is set
         int x = Mathf.RoundToInt(transform.position.x) + direction.x;
         int y = Mathf.RoundToInt(transform.position.y) + direction.y;
         transform.position = new Vector2(x, y);
@@ -99,8 +108,8 @@ public class SnakeController : MonoBehaviour
             if (segmentOfSnakeBodyPartList.Count > initialSize)
             {
                 Transform lastSegment = segmentOfSnakeBodyPartList[segmentOfSnakeBodyPartList.Count - 1];
-                segmentOfSnakeBodyPartList.Remove(lastSegment);
                 Destroy(lastSegment.gameObject);
+                segmentOfSnakeBodyPartList.Remove(lastSegment);               
             }
         }
     }
@@ -108,7 +117,8 @@ public class SnakeController : MonoBehaviour
     public void ResetState()
     {
         direction = Vector2Int.right;
-        transform.position = Vector3.zero;
+        //transform.position = Vector3.zero;
+        transform.position = targetGameObject.position;
         // Start at 1 to skip destroying the head
         for (int i = 1; i < segmentOfSnakeBodyPartList.Count; i++)
         {
@@ -124,6 +134,8 @@ public class SnakeController : MonoBehaviour
             Grow();
         }
     }
+
+    //
     public bool Occupies(int x, int y)
     {
         foreach (Transform segment in segmentOfSnakeBodyPartList)
@@ -144,7 +156,8 @@ public class SnakeController : MonoBehaviour
             Food food = other.GetComponent<Food>();
             if (food != null)
             {
-                ScoreManager scoreManager = ScoreManager.Instance;
+                //
+                ScoreManager1 scoreManager = ScoreManager1.Instance;
                 //Check if food is mass gainer
                 if (food.GetFoodType() == true)
                 {
@@ -155,13 +168,13 @@ public class SnakeController : MonoBehaviour
                         //Increase score at double rate
                         int increasedScore = scoreManager.GetScoreVal(); 
                         int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal(); 
-                        scoreManager.AddScore(increasedScore * scoreMultiplier);
+                        scoreManager.AddScore(increasedScore * scoreMultiplier , this);
                     }
                     else
                     {
                         int scoreVal = scoreManager.GetScoreVal();
                         Debug.Log("ScoreVal :" + scoreVal);
-                        scoreManager.AddScore(scoreVal);
+                        scoreManager.AddScore(scoreVal, this);
                     }
 
                     foodManager.IncreaseSpawnCounterVal();
@@ -169,7 +182,7 @@ public class SnakeController : MonoBehaviour
                 }
                 else if (food.GetFoodType() == false)   ////Check if food is mass burner
                 {
-                    scoreManager.ReduceScore(scoreManager.GetScoreVal());
+                    scoreManager.ReduceScore(scoreManager.GetScoreVal(), this);
                     
                     Shrink(1);
                 }
@@ -183,16 +196,16 @@ public class SnakeController : MonoBehaviour
                 // Prevent duplicate calls using a flag
                 if (!powerUp.HasBeenActivated)
                 {
-                    powerUp.HasBeenActivated = true; // Mark as processed              
-                    foodManager.ApplyPowerUpEffect(powerUp.powerUpType);
+                    powerUp.HasBeenActivated = true; // Mark as processed
+                    foodManager.ApplyPowerUpEffect(powerUp.powerUpType, this);
                     Destroy(other.gameObject);
                 }
             }
         }
-        else if (other.gameObject.CompareTag("Obstacle"))
+        else if (other.gameObject.CompareTag("Obstacle") )
         {
             if (!foodManager.GetIsShieldActive()){
-                GameManager.Instance.DisplayGameOverPanel();
+                GameManagerMultiplayer.Instance.DisplayGameOverPanel();
             }
         }
         else if (other.gameObject.CompareTag("Wall"))
@@ -203,7 +216,7 @@ public class SnakeController : MonoBehaviour
             }
             else if (!foodManager.GetIsShieldActive())
             {
-                GameManager.Instance.DisplayGameOverPanel();
+                GameManagerMultiplayer.Instance.DisplayGameOverPanel();
             }
         }
     }

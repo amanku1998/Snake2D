@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] private Button SingleModeButton;
+    [SerializeField] private Button MultiPlayerModeButton;
     [SerializeField] private Button QuitButton;
 
 
@@ -14,12 +15,18 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         SingleModeButton.onClick.AddListener(PlaySingleMode);
+        MultiPlayerModeButton.onClick.AddListener(PlayMultiPlayerMode);
         QuitButton.onClick.AddListener(QuitGame);
     }
 
     private void PlaySingleMode()
     {
         SceneManager.LoadScene(1);
+    }
+    
+    private void PlayMultiPlayerMode()
+    {
+        SceneManager.LoadScene(2);
     }
 
     private void QuitGame()
