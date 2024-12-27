@@ -8,7 +8,9 @@ public class FoodManager : MonoBehaviour
     [SerializeField] private GameObject[] FoodPrefabs; // Mass Gainer and Mass Reducer prefabs
     [SerializeField] private Collider2D gridArea;
 
-    private SnakeController snake;
+    //private SnakeController snake;
+    [SerializeField] private SnakeController snake1;
+    [SerializeField] private SnakeController snake2;
 
     [SerializeField] private float foodLifeSpan = 15f; // Time before food auto-destroys
     private GameObject currentFood; // Track the active food
@@ -27,14 +29,10 @@ public class FoodManager : MonoBehaviour
     [SerializeField] private float scoreBoostDuration = 3f;
     [SerializeField] private float speedBoostDuration = 10f;
 
-    private bool isShieldActive = false;
-    private bool isScoreBoostActive = false;
-    private bool isSpeedBoostActive = false;
-
     private string activePowerUpType = ""; // Track the currently active power-up type
     private bool isPowerUpEffectActive = false; // Track if a power-up effect is active
 
-    [SerializeField]private Image currentSelectedIcon;
+    [SerializeField] private Image currentSelectedIcon;
     [SerializeField] private Sprite[] powerUpIcon;
 
     public void SetCurrentSelectedIcon(int powerUpIndex)
@@ -47,10 +45,6 @@ public class FoodManager : MonoBehaviour
     {
         currentSelectedIcon.enabled = false;
         currentSelectedIcon.sprite = null;
-    }
-    private void Awake()
-    {
-        snake = FindObjectOfType<SnakeController>();
     }
 
     private void Start()
@@ -84,15 +78,20 @@ public class FoodManager : MonoBehaviour
             int x = Mathf.RoundToInt(Random.Range(bounds.min.x, bounds.max.x));
             int y = Mathf.RoundToInt(Random.Range(bounds.min.y, bounds.max.y));
             newPosition = new Vector2(x, y);
+
+            // Check position against snake(s) occupancy
         }
-        while (snake.Occupies((int)newPosition.x, (int)newPosition.y));
+        while (snake1.Occupies((int)newPosition.x, (int)newPosition.y) ||
+       (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer &&
+        snake2.Occupies((int)newPosition.x, (int)newPosition.y)));
 
         bool isMassGainer = spawnCounter < 4 ? true : Random.Range(0, 10) < 8;
         // Select the appropriate prefab based on isMassGainer value
-        //GameObject selectedPrefab = randomIsMassGainer ? FoodPrefabs[0] : FoodPrefabs[1];
         GameObject selectedPrefab = isMassGainer ? FoodPrefabs[0] : FoodPrefabs[1];
+
         // Instantiate the selected prefab
         currentFood = Instantiate(selectedPrefab, newPosition, Quaternion.identity);
+
         // Assign the isMassGainer value to the instantiated food
         Food foodComponent = currentFood.GetComponent<Food>();
         // Assign the isMassGainer value to the instantiated food
@@ -140,11 +139,13 @@ public class FoodManager : MonoBehaviour
                 int y = Mathf.RoundToInt(Random.Range(bounds.min.y, bounds.max.y));
                 spawnPosition = new Vector2(x, y);
             }
-            while (snake.Occupies((int)spawnPosition.x, (int)spawnPosition.y));
+            while (snake1.Occupies((int)spawnPosition.x, (int)spawnPosition.y) ||
+                (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer &&
+                snake2.Occupies((int)spawnPosition.x, (int)spawnPosition.y)));
 
             // Select a new power-up that the snake doesn't already have
             GameObject newPowerUp = GetNewPowerUp();
-            Debug.Log("newPowerUp :"+ newPowerUp.name);
+            Debug.Log("newPowerUp :" + newPowerUp.name);
             if (newPowerUp != null && isPowerUpEffectActive == false)
             {
                 currentPowerUp = Instantiate(newPowerUp, spawnPosition, Quaternion.identity);
@@ -183,27 +184,25 @@ public class FoodManager : MonoBehaviour
         DeactivateCurrentSelectedPowerIcon();
     }
 
-    public void ApplyPowerUpEffect(string powerUpType)
+    public void ApplyPowerUpEffect(string powerUpType, SnakeController snake)
     {
-        activePowerUpType = powerUpType;
         isPowerUpEffectActive = true;
+        activePowerUpType = powerUpType;
 
-        switch (powerUpType.ToString())
+        if (powerUpType == "Shield")
         {
-            case "Shield":
-                SetCurrentSelectedIcon((int)ItemType.Shield);
-                StartCoroutine(ActivateShield());
-                break;
-
-            case "ScoreBoost":
-                SetCurrentSelectedIcon((int)ItemType.ScoreBooster);
-                StartCoroutine(ActivateScoreBoost());
-                break;
-
-            case "SpeedUp":
-                SetCurrentSelectedIcon((int)ItemType.SpeedUp);
-                StartCoroutine(ActivateSpeedBoost());
-                break;
+            SetCurrentSelectedIcon((int)ItemType.Shield);
+            StartCoroutine(ActivateShield(snake));
+        }
+        else if (powerUpType == "ScoreBoost")
+        {
+            SetCurrentSelectedIcon((int)ItemType.ScoreBooster);
+            StartCoroutine(ActivateScoreBoost(snake));
+        }
+        else if (powerUpType == "SpeedUp")
+        {
+            SetCurrentSelectedIcon((int)ItemType.SpeedUp);
+            StartCoroutine(ActivateSpeedBoost(snake));
         }
     }
 
@@ -214,43 +213,39 @@ public class FoodManager : MonoBehaviour
 
     public int GetSpawnCounterVal() { return spawnCounter; }
     public void IncreaseSpawnCounterVal() { spawnCounter += 1; }
-    public float GetShieldDuration()    {   return shieldDuration;  }
-    public float GetScoreBoostDuration()    {   return scoreBoostDuration;  }
-    public float GetSpeedBoostDuration()    {   return speedBoostDuration;  }
-    public bool GetIsShieldActive() { return isShieldActive; }
-    public bool GetIsScoreBoostActive() { return isScoreBoostActive; }
-    public bool GetIsSpeedBoostActive() { return isSpeedBoostActive; }
+    public float GetShieldDuration() { return shieldDuration; }
+    public float GetScoreBoostDuration() { return scoreBoostDuration; }
+    public float GetSpeedBoostDuration() { return speedBoostDuration; }
 
-    private IEnumerator ActivateShield()
+    private IEnumerator ActivateShield(SnakeController snake)
     {
-        isShieldActive = true;
+        snake.SetIsShieldActive(true);
         yield return new WaitForSeconds(GetShieldDuration());
-        isShieldActive = false;
-
+        snake.SetIsShieldActive(false);
         ResetPowerUpVariables();
     }
 
-    private IEnumerator ActivateScoreBoost()
+    private IEnumerator ActivateScoreBoost(SnakeController snake)
     {
-        isScoreBoostActive = true;
+        snake.SetIsScoreBoostActive(true);
         yield return new WaitForSeconds(GetScoreBoostDuration());
-        isScoreBoostActive = false;
-
+        snake.SetIsScoreBoostActive(false);
         ResetPowerUpVariables();
     }
 
-    private IEnumerator ActivateSpeedBoost()
+    private IEnumerator ActivateSpeedBoost(SnakeController snake)
     {
-        isSpeedBoostActive = true;
+        snake.SetIsSpeedBoostActive(true);
         float curSnakeSpeed = snake.GetSpeed();
         snake.SetSpeed(curSnakeSpeed * 1.5f); // Adjust multiplier as needed
-        Debug.Log("Increase speed :" + snake.GetSpeed());
+
         yield return new WaitForSeconds(GetSpeedBoostDuration());
+
         snake.SetSpeed(snake.GetDefaultSpeed());
-        isSpeedBoostActive = false;
+        snake.SetIsSpeedBoostActive(false);
 
         ResetPowerUpVariables();
     }
-
 }
-public enum ItemType { Shield, ScoreBooster, SpeedUp }
+public enum ItemType { Shield , ScoreBooster , SpeedUp }
+

@@ -10,26 +10,12 @@ public class PowerUpController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (SceneManager.GetActiveScene().buildIndex == 1)
+        if (collision.CompareTag("Snake1") || collision.CompareTag("Snake2"))
         {
-            if (collision.CompareTag("Player")) // Assuming the snake head is tagged as "Player"
+            SnakeController snake = collision.GetComponent<SnakeController>();
+            if (snake != null)
             {
-                SnakeController snake = collision.GetComponent<SnakeController>();
-                if (snake != null)
-                {
-                    Destroy(gameObject); // Remove the power-up after collection
-                }
-            }
-        }
-        else
-        {
-            if (collision.CompareTag("Snake1") || collision.CompareTag("Snake2"))
-            {
-                SnakeController1 snake = collision.GetComponent<SnakeController1>();
-                if (snake != null)
-                {
-                    Destroy(gameObject); // Remove the power-up after collection
-                }
+                Destroy(gameObject); // Remove the power-up after collection
             }
         }
     }

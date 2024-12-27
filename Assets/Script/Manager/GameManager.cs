@@ -4,15 +4,21 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance; // Singleton to access from other scripts
-
     [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private TextMeshProUGUI scoreTextInGameOverPanel; // Reference to the high score UI in the Game Over Panel
-    [SerializeField] private TextMeshProUGUI highScoreTextInGameOverPanel; // Reference to the high score UI in the Game Over Panel
 
+    [Header("Single Player UI")]
+    [SerializeField] private TextMeshProUGUI scoreTextInGameOverPanel;
+    [SerializeField] private TextMeshProUGUI highScoreTextInGameOverPanel;
+
+    [Header("Multiplayer UI")]
+    [SerializeField] private TextMeshProUGUI gameResultText;
+    [SerializeField] private TextMeshProUGUI player1ScoreTextInGameOverPanel; // Reference to the high score UI in the Game Over Panel
+    [SerializeField] private TextMeshProUGUI player2ScoreTextInGameOverPanel; // Reference to the high score UI in the Game Over Panel
+
+    [Header("Buttons")]
     [SerializeField] private Button restartButton;
     [SerializeField] private Button menuButton;
 
@@ -41,8 +47,32 @@ public class GameManager : MonoBehaviour
     // Display high score in the Game Over Panel
     public void DisplayScore()
     {
-        scoreTextInGameOverPanel.text = "Score : " + ScoreManager.Instance.GetCurrentScore();
-        highScoreTextInGameOverPanel.text = "High Score : " + ScoreManager.Instance.GetHighScore();
+        if(GameModeManager.Instance.GetCurrentMode() == GameMode.SinglePlayer)
+        {
+            scoreTextInGameOverPanel.text = "Score : "+ ScoreManager.Instance.GetCurrentScore();
+            highScoreTextInGameOverPanel.text = "High Score : " + ScoreManager.Instance.GetHighScore();
+        }
+        else if(GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer)
+        {
+            int player1Score = ScoreManager.Instance.GetPlayer1CurrentScore();
+            int player2Score = ScoreManager.Instance.GetPlayer2CurrentScore();
+
+            if (player1Score == player2Score)
+            {
+                gameResultText.text = "Draw";
+            }
+            else if (player1Score > player2Score)
+            {
+                gameResultText.text = "Player1 Win";
+            }
+            else
+            {
+                gameResultText.text = "Player2 Win";
+            }
+
+            player1ScoreTextInGameOverPanel.text = "Player1 Score : " + player1Score;
+            player2ScoreTextInGameOverPanel.text = "Player2 Score : " + player2Score;
+        }
     }
 
     public void DisplayGameOverPanel()

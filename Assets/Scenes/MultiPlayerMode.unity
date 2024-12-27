@@ -2056,7 +2056,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetGameObject: {fileID: 1212321477}
-  playerID: Player2
   speed: 12
   speedMultiplier: 1
   initialSize: 4
@@ -2625,7 +2624,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverPanel: {fileID: 1712230165}
-  gameResult: {fileID: 1727635187}
+  scoreTextInGameOverPanel: {fileID: 0}
+  highScoreTextInGameOverPanel: {fileID: 0}
+  gameResultText: {fileID: 1727635187}
   player1ScoreTextInGameOverPanel: {fileID: 1752093774}
   player2ScoreTextInGameOverPanel: {fileID: 2030199520}
   restartButton: {fileID: 1571127423}
@@ -3698,6 +3699,8 @@ MonoBehaviour:
   - {fileID: 183888202841421270, guid: fd09d7ced6051f74cafa668d1c2695c0, type: 3}
   - {fileID: 183888202841421270, guid: 88b04c0267ffe61418633e93bc805503, type: 3}
   gridArea: {fileID: 2007574399}
+  snake1: {fileID: 8755927253395129402}
+  snake2: {fileID: 775257631}
   foodLifeSpan: 15
   powerUpSpawnIntervalMin: 6
   powerUpSpawnIntervalMax: 20
@@ -5219,7 +5222,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetGameObject: {fileID: 580234349}
-  playerID: Player1
   speed: 12
   speedMultiplier: 1
   initialSize: 4

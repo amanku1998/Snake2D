@@ -1698,7 +1698,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 706769277}
-  - component: {fileID: 706769276}
+  - component: {fileID: 706769278}
   m_Layer: 0
   m_Name: ScoreManager
   m_TagString: Untagged
@@ -1706,22 +1706,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &706769276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706769275}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d2d76ed7747e2b40a0761497a072d82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 2136923878}
-  highScoreText: {fileID: 244893766}
-  scoreVal: 5
-  increamentScoreMultiplier: 2
 --- !u!4 &706769277
 Transform:
   m_ObjectHideFlags: 0
@@ -1737,6 +1721,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &706769278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706769275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 371747674a09bf44e828004cdae85b7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreText: {fileID: 2136923878}
+  highScoreText: {fileID: 244893766}
+  player1ScoreText: {fileID: 0}
+  player2ScoreText: {fileID: 0}
+  scoreVal: 5
+  increamentScoreMultiplier: 2
 --- !u!1 &747512871
 GameObject:
   m_ObjectHideFlags: 0
@@ -2027,6 +2029,37 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.14, z: 0}
   m_LocalScale: {x: 4400, y: 2400, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &846362558
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 846362559}
+  m_Layer: 0
+  m_Name: SpawningPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &846362559
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846362558}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2526,7 +2559,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1138225823}
-  - component: {fileID: 1138225822}
+  - component: {fileID: 1138225824}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2534,23 +2567,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1138225822
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138225821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05cee04c670f9bd47adfa5b21a64990d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameOverPanel: {fileID: 1712230165}
-  scoreTextInGameOverPanel: {fileID: 1752093774}
-  highScoreTextInGameOverPanel: {fileID: 2030199520}
-  restartButton: {fileID: 1571127423}
-  menuButton: {fileID: 1588201083}
 --- !u!4 &1138225823
 Transform:
   m_ObjectHideFlags: 0
@@ -2566,6 +2582,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1138225824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138225821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07fb0708cb683ce44981460db8431032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameOverPanel: {fileID: 1712230165}
+  scoreTextInGameOverPanel: {fileID: 1752093774}
+  highScoreTextInGameOverPanel: {fileID: 2030199520}
+  gameResultText: {fileID: 0}
+  player1ScoreTextInGameOverPanel: {fileID: 0}
+  player2ScoreTextInGameOverPanel: {fileID: 0}
+  restartButton: {fileID: 1571127423}
+  menuButton: {fileID: 1588201083}
 --- !u!1 &1155085126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3622,7 +3658,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1609091238}
-  - component: {fileID: 1609091237}
+  - component: {fileID: 1609091239}
   m_Layer: 0
   m_Name: FoodManager
   m_TagString: Untagged
@@ -3630,37 +3666,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1609091237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1609091236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca4473948d77450458e1b082891ae4a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FoodPrefabs:
-  - {fileID: 183888202841421270, guid: fd09d7ced6051f74cafa668d1c2695c0, type: 3}
-  - {fileID: 183888202841421270, guid: 88b04c0267ffe61418633e93bc805503, type: 3}
-  gridArea: {fileID: 2007574399}
-  foodLifeSpan: 15
-  powerUpSpawnIntervalMin: 6
-  powerUpSpawnIntervalMax: 20
-  powerUpPrefabs:
-  - {fileID: 7401145230263335777, guid: a9b93839a1048724d9d741f14d754340, type: 3}
-  - {fileID: 8767245424652977761, guid: 93634a34831b3f341b1720d73cce1ed7, type: 3}
-  - {fileID: 8767245424652977761, guid: ff4ebd015edfbe64d96e8f9e2f22bf24, type: 3}
-  shieldDuration: 10
-  scoreBoostDuration: 10
-  speedBoostDuration: 10
-  currentSelectedIcon: {fileID: 341042044}
-  powerUpIcon:
-  - {fileID: 21300000, guid: 57d46bf3824712446a7eb3f1814b3683, type: 3}
-  - {fileID: 21300000, guid: 6464277845356584683d23a88316f6d4, type: 3}
-  - {fileID: 21300000, guid: c63c1537eb2f6c94aae159ef4488abc8, type: 3}
 --- !u!4 &1609091238
 Transform:
   m_ObjectHideFlags: 0
@@ -3676,6 +3681,39 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1609091239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609091236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b9c85a270b73ba49bb61ca14f5b9d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FoodPrefabs:
+  - {fileID: 183888202841421270, guid: fd09d7ced6051f74cafa668d1c2695c0, type: 3}
+  - {fileID: 183888202841421270, guid: 88b04c0267ffe61418633e93bc805503, type: 3}
+  gridArea: {fileID: 2007574399}
+  snake1: {fileID: 8755927253395129402}
+  snake2: {fileID: 0}
+  foodLifeSpan: 15
+  powerUpSpawnIntervalMin: 6
+  powerUpSpawnIntervalMax: 20
+  powerUpPrefabs:
+  - {fileID: 7401145230263335777, guid: a9b93839a1048724d9d741f14d754340, type: 3}
+  - {fileID: 8767245424652977761, guid: 93634a34831b3f341b1720d73cce1ed7, type: 3}
+  - {fileID: 8767245424652977761, guid: ff4ebd015edfbe64d96e8f9e2f22bf24, type: 3}
+  shieldDuration: 10
+  scoreBoostDuration: 10
+  speedBoostDuration: 10
+  currentSelectedIcon: {fileID: 341042044}
+  powerUpIcon:
+  - {fileID: 21300000, guid: 57d46bf3824712446a7eb3f1814b3683, type: 3}
+  - {fileID: 21300000, guid: 6464277845356584683d23a88316f6d4, type: 3}
+  - {fileID: 21300000, guid: c63c1537eb2f6c94aae159ef4488abc8, type: 3}
 --- !u!1 &1633645239
 GameObject:
   m_ObjectHideFlags: 0
@@ -4887,25 +4925,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &4123220955778997207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4166706738809144359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 805c396cdaa2bdf43ae9578c22d5a76e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 12
-  speedMultiplier: 1
-  initialSize: 3
-  segmentPrefab: {fileID: 3151447670240262035, guid: 7238953d05de4ca46a40022c78430643, type: 3}
-  moveThroughWalls: 1
-  direction: {x: 1, y: 0}
-  foodManager: {fileID: 1609091237}
 --- !u!1 &4166706738809144359
 GameObject:
   m_ObjectHideFlags: 0
@@ -4918,10 +4937,10 @@ GameObject:
   - component: {fileID: 8755927253395129401}
   - component: {fileID: 2704391688957514833}
   - component: {fileID: 976159886834057821}
-  - component: {fileID: 4123220955778997207}
+  - component: {fileID: 8755927253395129402}
   m_Layer: 0
   m_Name: Snake
-  m_TagString: Player
+  m_TagString: Snake1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4978,6 +4997,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8755927253395129402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4166706738809144359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc96abc52bfd62941a0b59d41da54281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetGameObject: {fileID: 846362559}
+  speed: 12
+  speedMultiplier: 1
+  initialSize: 3
+  segmentPrefab: {fileID: 3151447670240262035, guid: 7238953d05de4ca46a40022c78430643, type: 3}
+  moveThroughWalls: 1
+  direction: {x: 1, y: 0}
+  foodManager: {fileID: 1609091239}
+  upKey: 273
+  downKey: 274
+  leftKey: 276
+  rightKey: 275
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -4997,3 +5040,4 @@ SceneRoots:
   - {fileID: 1609091238}
   - {fileID: 1519742023}
   - {fileID: 1138225823}
+  - {fileID: 846362559}
