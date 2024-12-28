@@ -25,41 +25,41 @@ public class FoodManager : MonoBehaviour
     private GameObject currentPowerUp; // Track the active power-up
     [SerializeField] private GameObject[] powerUpPrefabs;
 
-    [SerializeField] private float shieldDuration = 3f;
-    [SerializeField] private float scoreBoostDuration = 3f;
+    [SerializeField] private float shieldDuration = 10f;
+    [SerializeField] private float scoreBoostDuration = 10f;
     [SerializeField] private float speedBoostDuration = 10f;
 
-    private string activePowerUpType = ""; // Track the currently active power-up type
+    private ItemType activePowerUpType = ItemType.None; // Track the currently active power-up type
     private bool isPowerUpEffectActive = false; // Track if a power-up effect is active
 
     [SerializeField] private Image currentSelectedIcon;
     [SerializeField] private Sprite[] powerUpIcon;
 
-    public void SetCurrentSelectedIcon(int powerUpIndex)
-    {
-        currentSelectedIcon.enabled = true;
-        currentSelectedIcon.sprite = powerUpIcon[powerUpIndex];
-    }
-
-    public void DeactivateCurrentSelectedPowerIcon()
-    {
-        currentSelectedIcon.enabled = false;
-        currentSelectedIcon.sprite = null;
-    }
+    private float powerUpTimer;
+    private float currentSpawnInterval;
 
     private void Start()
     {
         SpawnFoodRandomly();
-        StartCoroutine(SpawnPowerUps());
+
+        ResetPowerUpVariables();
+        SetNewSpawnInterval();
     }
 
-    public void ReSpawnFood()
+    private void Update()
     {
-        //
-        SpawnFoodRandomly();
-        // Start coroutine to handle food lifespan
-        currentCoroutine = StartCoroutine(FoodLifeCycle());
+        if (isPowerUpEffectActive)
+            return;
+
+        powerUpTimer -= Time.deltaTime;
+
+        if (powerUpTimer <= 0f)
+        {
+            SpawnNewPowerUp();
+            SetNewSpawnInterval();
+        }
     }
+
 
     public void SpawnFoodRandomly()
     {
@@ -69,21 +69,7 @@ public class FoodManager : MonoBehaviour
             Destroy(currentFood);
         }
 
-        Bounds bounds = gridArea.bounds;
-        Vector2 newPosition;
-
-        do
-        {
-            // Generate random positions within bounds
-            int x = Mathf.RoundToInt(Random.Range(bounds.min.x, bounds.max.x));
-            int y = Mathf.RoundToInt(Random.Range(bounds.min.y, bounds.max.y));
-            newPosition = new Vector2(x, y);
-
-            // Check position against snake(s) occupancy
-        }
-        while (snake1.Occupies((int)newPosition.x, (int)newPosition.y) ||
-       (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer &&
-        snake2.Occupies((int)newPosition.x, (int)newPosition.y)));
+        Vector2 newPosition = GetRandomPositionForItem();
 
         bool isMassGainer = spawnCounter < 4 ? true : Random.Range(0, 10) < 8;
         // Select the appropriate prefab based on isMassGainer value
@@ -96,6 +82,49 @@ public class FoodManager : MonoBehaviour
         Food foodComponent = currentFood.GetComponent<Food>();
         // Assign the isMassGainer value to the instantiated food
         foodComponent.SetFoodType(isMassGainer);
+        foodComponent.SetFoodManager(this);
+    }
+
+    //
+    private void SpawnNewPowerUp()
+    {
+        // Destroy the existing power-up if it exists
+        if (currentPowerUp != null)
+        {
+            Destroy(currentPowerUp);
+        }
+
+        // Select a new random power-up and position
+        GameObject newPowerUp = GetNewPowerUp();
+        if (newPowerUp != null)
+        {
+            Vector2 spawnPosition = GetRandomPositionForItem();
+            currentPowerUp = Instantiate(newPowerUp, spawnPosition, Quaternion.identity);
+        }
+    }
+
+    private void SetNewSpawnInterval()
+    {
+        currentSpawnInterval = Random.Range(powerUpSpawnIntervalMin, powerUpSpawnIntervalMax);
+        powerUpTimer = currentSpawnInterval;
+    }
+
+    public Vector2 GetRandomPositionForItem()
+    {
+        Bounds bounds = gridArea.bounds;
+        Vector2 spawnPosition;
+
+        do
+        {
+            int x = Mathf.RoundToInt(Random.Range(bounds.min.x, bounds.max.x));
+            int y = Mathf.RoundToInt(Random.Range(bounds.min.y, bounds.max.y));
+            spawnPosition = new Vector2(x, y);
+        }//Check the power up is not get the position where any snake is already moving
+        while (snake1.Occupies((int)spawnPosition.x, (int)spawnPosition.y) ||
+            (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer &&
+            snake2.Occupies((int)spawnPosition.x, (int)spawnPosition.y)));
+
+        return spawnPosition;
     }
 
     public void StopFoodSpawnCoroutine()
@@ -115,42 +144,12 @@ public class FoodManager : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnPowerUps()
+    public void ReSpawnFood()
     {
-        while (true)
-        {
-            // Wait until no power-up effect is active
-            yield return new WaitUntil(() => !isPowerUpEffectActive);
-
-            yield return new WaitForSeconds(Random.Range(powerUpSpawnIntervalMin, powerUpSpawnIntervalMax));
-
-            // Destroy existing power-up if it exists
-            if (currentPowerUp != null)
-            {
-                Destroy(currentPowerUp);
-            }
-
-            Bounds bounds = gridArea.bounds;
-            Vector2 spawnPosition;
-
-            do
-            {
-                int x = Mathf.RoundToInt(Random.Range(bounds.min.x, bounds.max.x));
-                int y = Mathf.RoundToInt(Random.Range(bounds.min.y, bounds.max.y));
-                spawnPosition = new Vector2(x, y);
-            }
-            while (snake1.Occupies((int)spawnPosition.x, (int)spawnPosition.y) ||
-                (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer &&
-                snake2.Occupies((int)spawnPosition.x, (int)spawnPosition.y)));
-
-            // Select a new power-up that the snake doesn't already have
-            GameObject newPowerUp = GetNewPowerUp();
-            Debug.Log("newPowerUp :" + newPowerUp.name);
-            if (newPowerUp != null && isPowerUpEffectActive == false)
-            {
-                currentPowerUp = Instantiate(newPowerUp, spawnPosition, Quaternion.identity);
-            }
-        }
+        //
+        SpawnFoodRandomly();
+        // Start coroutine to handle food lifespan
+        currentCoroutine = StartCoroutine(FoodLifeCycle());
     }
 
     private GameObject GetNewPowerUp()
@@ -178,32 +177,46 @@ public class FoodManager : MonoBehaviour
     private void ResetPowerUpVariables()
     {
         isPowerUpEffectActive = false;
-        activePowerUpType = ""; // Clear the active power-up type
-        ClearCurrentPowerUp();
-
+        activePowerUpType = ItemType.None;
+        if (currentPowerUp != null)
+        {
+            Destroy(currentPowerUp);
+        }
         DeactivateCurrentSelectedPowerIcon();
     }
 
-    public void ApplyPowerUpEffect(string powerUpType, SnakeController snake)
+    public void ApplyPowerUpEffect(ItemType powerUpType, SnakeController snake)
     {
         isPowerUpEffectActive = true;
         activePowerUpType = powerUpType;
 
-        if (powerUpType == "Shield")
+        if (powerUpType == ItemType.Shield)
         {
             SetCurrentSelectedIcon((int)ItemType.Shield);
             StartCoroutine(ActivateShield(snake));
         }
-        else if (powerUpType == "ScoreBoost")
+        else if (powerUpType == ItemType.ScoreBooster)
         {
             SetCurrentSelectedIcon((int)ItemType.ScoreBooster);
             StartCoroutine(ActivateScoreBoost(snake));
         }
-        else if (powerUpType == "SpeedUp")
+        else if (powerUpType == ItemType.SpeedUp)
         {
             SetCurrentSelectedIcon((int)ItemType.SpeedUp);
             StartCoroutine(ActivateSpeedBoost(snake));
         }
+    }
+
+    public void SetCurrentSelectedIcon(int powerUpIndex)
+    {
+        currentSelectedIcon.enabled = true;
+        currentSelectedIcon.sprite = powerUpIcon[powerUpIndex];
+    }
+
+    public void DeactivateCurrentSelectedPowerIcon()
+    {
+        currentSelectedIcon.enabled = false;
+        currentSelectedIcon.sprite = null;
     }
 
     public void ClearCurrentPowerUp()
@@ -247,5 +260,5 @@ public class FoodManager : MonoBehaviour
         ResetPowerUpVariables();
     }
 }
-public enum ItemType { Shield , ScoreBooster , SpeedUp }
+public enum ItemType { Shield , ScoreBooster , SpeedUp , None }
 

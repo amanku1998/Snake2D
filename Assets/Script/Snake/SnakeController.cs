@@ -8,6 +8,7 @@ public class SnakeController : MonoBehaviour
     [SerializeField] private float speed = 10f;
     [SerializeField] private float speedMultiplier = 1f;
     [SerializeField] private int initialSize = 4;
+    [SerializeField] private PlayerType PlayerID;
 
     [Header("Game Objects")]
     [SerializeField] private Transform segmentPrefab;
@@ -154,54 +155,48 @@ public class SnakeController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Food"))
-        {
-            Food food = other.GetComponent<Food>();
-            if (food != null)
-            {
-                //
-                ScoreManager scoreManager = ScoreManager.Instance;
-                //Check if food is mass gainer
-                if (food.GetFoodType() == true)
-                {
-                    //Check if snake get double score
-                    if (isScoreBoostActive)
-                    {
-                        //Increase score at double rate
-                        int increasedScore = scoreManager.GetScoreVal();
-                        int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal();
-                        scoreManager.AddScore(increasedScore * scoreMultiplier, this);
-                    }
-                    else
-                    {
-                        int scoreVal = scoreManager.GetScoreVal();
-                        Debug.Log("ScoreVal :" + scoreVal);
-                        scoreManager.AddScore(scoreVal, this);
-                    }
+        Food food = other.GetComponent<Food>();
+        PowerUpController powerUp = other.GetComponent<PowerUpController>();
 
-                    foodManager.IncreaseSpawnCounterVal();
-                    Grow();
-                }
-                else if (food.GetFoodType() == false)   ////Check if food is mass burner
+        if (food != null)
+        {
+            ScoreManager scoreManager = ScoreManager.Instance;
+            //Check if food is mass gainer
+            if (food.GetFoodType() == true)
+            {
+                //Check if snake get double score
+                if (isScoreBoostActive)
                 {
-                    scoreManager.ReduceScore(scoreManager.GetScoreVal(), this);
-                    
-                    Shrink(1);
+                    //Increase score at double rate
+                    int increasedScore = scoreManager.GetScoreVal();
+                    int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal();
+                    scoreManager.AddScore(increasedScore * scoreMultiplier, this);
                 }
+                else
+                {
+                    int scoreVal = scoreManager.GetScoreVal();
+                    Debug.Log("ScoreVal :" + scoreVal);
+                    scoreManager.AddScore(scoreVal, this);
+                }
+
+                foodManager.IncreaseSpawnCounterVal();
+                Grow();
+            }
+            else if (food.GetFoodType() == false)   ////Check if food is mass burner
+            {
+                scoreManager.ReduceScore(scoreManager.GetScoreVal(), this);
+                    
+                Shrink(1);
             }
         }
-        else if (other.gameObject.CompareTag("PowerUp"))
+        else if (powerUp != null)
         {
-            PowerUpController powerUp = other.GetComponent<PowerUpController>();
-            if (powerUp != null)
+            // Prevent duplicate calls using a flag
+            if (!powerUp.HasBeenActivated)
             {
-                // Prevent duplicate calls using a flag
-                if (!powerUp.HasBeenActivated)
-                {
-                    powerUp.HasBeenActivated = true; // Mark as processed
-                    foodManager.ApplyPowerUpEffect(powerUp.powerUpType, this);
-                    Destroy(other.gameObject);
-                }
+                powerUp.HasBeenActivated = true; // Mark as processed
+                foodManager.ApplyPowerUpEffect(powerUp.powerUpType, this);
+                Destroy(other.gameObject);
             }
         }
         else if (other.gameObject.CompareTag("Obstacle") )
@@ -249,4 +244,7 @@ public class SnakeController : MonoBehaviour
     public void SetIsScoreBoostActive(bool isActive) { isScoreBoostActive = isActive; }
     public bool GetIsSpeedBoostActive() { return isSpeedBoostActive; }
     public void SetIsSpeedBoostActive(bool isActive) { isSpeedBoostActive = isActive; }
+    public PlayerType GetCurrentSnake() { return PlayerID; }
 }
+
+public enum PlayerType { Snake1, Snake2}

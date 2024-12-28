@@ -25,17 +25,6 @@ public class GameModeManager : MonoBehaviour
     public void ChangeGameMode(GameMode mode)
     {
         currentGameMode = mode;
-
-        if (currentGameMode == GameMode.SinglePlayer)
-        {
-            Debug.Log("Game mode changed to Single Player");
-            // Additional setup for Single Player mode if needed
-        }
-        else if (currentGameMode == GameMode.Multiplayer)
-        {
-            Debug.Log("Game mode changed to Multiplayer");
-            // Additional setup for Multiplayer mode if needed
-        }
     }
 
     public GameMode GetCurrentMode()

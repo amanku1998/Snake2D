@@ -9,11 +9,6 @@ public class Food : MonoBehaviour
     private FoodManager foodManager;
     private bool isMassGainer;
 
-    private void Awake()
-    {
-        foodManager = FindObjectOfType<FoodManager>();
-    }
-
     private void Start()
     {
         StartCoroutine(foodManager.FoodLifeCycle());
@@ -33,4 +28,5 @@ public class Food : MonoBehaviour
 
     public bool GetFoodType() { return isMassGainer; }
     public void SetFoodType(bool massGainer) { isMassGainer = massGainer; }
+    public void SetFoodManager(FoodManager _foodManager) { foodManager = _foodManager; }
 }

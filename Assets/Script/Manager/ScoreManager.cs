@@ -70,11 +70,11 @@ public class ScoreManager : MonoBehaviour
         }
         else if (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer)
         {
-            if (snake.tag == "Snake1")
+            if (snake.GetCurrentSnake() == PlayerType.Snake1)
             {
                 player1CurrentScore += points;
             }
-            else if (snake.tag == "Snake2")
+            else if (snake.GetCurrentSnake() == PlayerType.Snake2)
             {
                 player2CurrentScore += points;
             }
@@ -94,12 +94,13 @@ public class ScoreManager : MonoBehaviour
             }
             else if (GameModeManager.Instance.GetCurrentMode() == GameMode.Multiplayer)
             {
-                if (snake.tag == "Snake1")
+                //if (snake.tag == "Snake1")
+                if (snake.GetCurrentSnake() == PlayerType.Snake1)
                 {
                     player1CurrentScore -= points;
                     UpdateScoreText();
                 }
-                else if (snake.tag == "Snake2")
+                else if (snake.GetCurrentSnake() == PlayerType.Snake2)
                 {
                     player2CurrentScore -= points;
                     UpdateScoreText();

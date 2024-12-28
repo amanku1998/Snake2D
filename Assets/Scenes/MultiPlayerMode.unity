@@ -1670,6 +1670,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 371747674a09bf44e828004cdae85b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreText: {fileID: 0}
+  highScoreText: {fileID: 0}
   player1ScoreText: {fileID: 2136923878}
   player2ScoreText: {fileID: 703543907}
   scoreVal: 5
@@ -2059,6 +2061,7 @@ MonoBehaviour:
   speed: 12
   speedMultiplier: 1
   initialSize: 4
+  PlayerID: 1
   segmentPrefab: {fileID: 3151447670240262035, guid: 7b9a815e4ab3b1f4bb485cbafdf8fe73, type: 3}
   moveThroughWalls: 1
   direction: {x: -1, y: 0}
@@ -5225,6 +5228,7 @@ MonoBehaviour:
   speed: 12
   speedMultiplier: 1
   initialSize: 4
+  PlayerID: 0
   segmentPrefab: {fileID: 3151447670240262035, guid: 7238953d05de4ca46a40022c78430643, type: 3}
   moveThroughWalls: 1
   direction: {x: 1, y: 0}
