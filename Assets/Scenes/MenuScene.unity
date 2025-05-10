@@ -3125,6 +3125,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1438703517}
+  - component: {fileID: 1438703518}
   m_Layer: 0
   m_Name: MenuManager
   m_TagString: Untagged
@@ -3147,6 +3148,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1438703518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438703516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57c98797da2d9bf4bacad15d61f80cb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SingleModeButton: {fileID: 238016542}
+  QuitButton: {fileID: 259204514}
 --- !u!1 &1529609286
 GameObject:
   m_ObjectHideFlags: 0
