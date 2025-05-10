@@ -4,84 +4,68 @@ using UnityEngine;
 
 public class SnakeController : MonoBehaviour
 {
-    [SerializeField] private Transform segmentPrefab;
-    [SerializeField] private Vector2Int direction = Vector2Int.right;
+    public Transform targetGameObject; // The GameObject whose position you want to assign to the snake
     [SerializeField] private float speed = 10f;
     [SerializeField] private float speedMultiplier = 1f;
     [SerializeField] private int initialSize = 4;
+    [SerializeField] private PlayerType PlayerID;
+
+    [Header("Game Objects")]
+    [SerializeField] private Transform segmentPrefab;
+
+    [Header("Game Settings")]
     [SerializeField] private bool moveThroughWalls = false;
 
+    [SerializeField] private Vector2Int direction = Vector2Int.right;
     private List<Transform> segmentOfSnakeBodyPartList = new List<Transform>();
-    private Vector2Int input;
+    private Vector2Int input = Vector2Int.zero;
     private float nextUpdate;
 
     [SerializeField] private FoodManager foodManager;
-
     private float defaultSpeedMultiplier;
+    [SerializeField] private KeyCode upKey, downKey, leftKey, rightKey; // Controls for the player
 
-    public void SetSpeed(float _speed)
-    {
-        speed = _speed;
-    }
-    
-    public float GetSpeed()
-    {
-        return speed;
-    }
+    private bool isShieldActive = false;
+    private bool isScoreBoostActive = false;
+    private bool isSpeedBoostActive = false;
 
-    public float GetDefaultSpeed()
-    {
-        return defaultSpeedMultiplier;
-    }
-
-    public List<Transform> GetSegmentOfSnakeBodyPartList()
-    {
-        return segmentOfSnakeBodyPartList;
-    }
-
-    private void Start()
+    private void Awake()
     {
         ResetState();
         defaultSpeedMultiplier = speed;
     }
 
+    private void Start()
+    {
+        ////Move the snake in the direction it is facing if no target is set
+        int x = Mathf.RoundToInt(targetGameObject.position.x);
+        int y = Mathf.RoundToInt(targetGameObject.position.y);
+        transform.position = new Vector2(x, y);
+    }
+
     private void Update()
     {
-        // Only allow turning up or down while moving in the x-axis
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        // Prevent turning back on itself
         if (direction.x != 0f)
         {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                input = Vector2Int.up;
-            }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                input = Vector2Int.down;
-            }      
-            else if (Input.GetKeyDown(KeyCode.L))
-            {
-                Shrink(1);
-            }
-            else if (Input.GetKeyDown(KeyCode.I))
-            {
-                ScoreManager.Instance.AddScore(10);
-            }
-            else if (Input.GetKeyDown(KeyCode.D))
-            {
-                ScoreManager.Instance.ReduceScore(10);
-            }
+            if (Input.GetKeyDown(upKey)) { input = Vector2Int.up; }
+            else if (Input.GetKeyDown(downKey)) { input = Vector2Int.down; }
         }
-        // Only allow turning left or right while moving in the y-axis
         else if (direction.y != 0f)
         {
-            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                input = Vector2Int.right;
-            }
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                input = Vector2Int.left;
-            }
+            if (Input.GetKeyDown(leftKey)) { input = Vector2Int.left; }
+            else if (Input.GetKeyDown(rightKey)) { input = Vector2Int.right; }
+        }
+
+        // Update direction
+        if (input != Vector2Int.zero)
+        {
+            direction = input;
         }
     }
 
@@ -104,8 +88,8 @@ public class SnakeController : MonoBehaviour
         {
             segmentOfSnakeBodyPartList[i].position = segmentOfSnakeBodyPartList[i - 1].position;
         }
-        // Move the snake in the direction it is facing
-        // Round the values to ensure it aligns to the grid
+        //// Round the values to ensure it aligns to the grid
+        // Move the snake in the direction it is facing if no target is set
         int x = Mathf.RoundToInt(transform.position.x) + direction.x;
         int y = Mathf.RoundToInt(transform.position.y) + direction.y;
         transform.position = new Vector2(x, y);
@@ -128,8 +112,8 @@ public class SnakeController : MonoBehaviour
             if (segmentOfSnakeBodyPartList.Count > initialSize)
             {
                 Transform lastSegment = segmentOfSnakeBodyPartList[segmentOfSnakeBodyPartList.Count - 1];
-                segmentOfSnakeBodyPartList.Remove(lastSegment);
                 Destroy(lastSegment.gameObject);
+                segmentOfSnakeBodyPartList.Remove(lastSegment);               
             }
         }
     }
@@ -137,7 +121,8 @@ public class SnakeController : MonoBehaviour
     public void ResetState()
     {
         direction = Vector2Int.right;
-        transform.position = Vector3.zero;
+        //transform.position = Vector3.zero;
+        transform.position = targetGameObject.position;
         // Start at 1 to skip destroying the head
         for (int i = 1; i < segmentOfSnakeBodyPartList.Count; i++)
         {
@@ -153,6 +138,8 @@ public class SnakeController : MonoBehaviour
             Grow();
         }
     }
+
+    //
     public bool Occupies(int x, int y)
     {
         foreach (Transform segment in segmentOfSnakeBodyPartList)
@@ -168,69 +155,55 @@ public class SnakeController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Food"))
+        Food food = other.GetComponent<Food>();
+        PowerUpController powerUp = other.GetComponent<PowerUpController>();
+
+        if (food != null)
         {
-            //Grow();
-            //Food food = other.GetComponent<Food>();
-            Food food = other.GetComponent<Food>();
-
-            if (food != null)
+            ScoreManager scoreManager = ScoreManager.Instance;
+            //Check if food is mass gainer
+            if (food.GetFoodType() == true)
             {
-                ScoreManager scoreManager = ScoreManager.Instance;
-
-                if (food.GetFoodType() == true)
+                //Check if snake get double score
+                if (isScoreBoostActive)
                 {
-                    Debug.Log("isScoreBoostActive :"+ foodManager.GetIsScoreBoostActive());
-                    if (foodManager.GetIsScoreBoostActive())
-                    {
-                        //Increase score at double rate
-                        int increasedScore = scoreManager.GetScoreVal(); 
-                        int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal(); 
-                        scoreManager.AddScore(increasedScore * scoreMultiplier);
-                    }
-                    else
-                    {
-                        int scoreVal = scoreManager.GetScoreVal();
-                        Debug.Log("ScoreVal :" + scoreVal);
-                        scoreManager.AddScore(scoreVal);
-                    }
+                    //Increase score at double rate
+                    int increasedScore = scoreManager.GetScoreVal();
+                    int scoreMultiplier = scoreManager.GetIncreamentScoreMultiplierVal();
+                    scoreManager.AddScore(increasedScore * scoreMultiplier, this);
+                }
+                else
+                {
+                    int scoreVal = scoreManager.GetScoreVal();
+                    Debug.Log("ScoreVal :" + scoreVal);
+                    scoreManager.AddScore(scoreVal, this);
+                }
+
+                foodManager.IncreaseSpawnCounterVal();
+                Grow();
+            }
+            else if (food.GetFoodType() == false)   ////Check if food is mass burner
+            {
+                scoreManager.ReduceScore(scoreManager.GetScoreVal(), this);
                     
-                    Grow();
-                }
-                else if (food.GetFoodType() == false)
-                {
-                    scoreManager.ReduceScore(scoreManager.GetScoreVal());
-                    //Shrink(food.lengthChangeAmount);
-                    Shrink(1);
-                }
-            }
-
-
-        }
-        else if (other.gameObject.CompareTag("PowerUp"))
-        {
-            PowerUpController powerUp = other.GetComponent<PowerUpController>();
-            if (powerUp != null)
-            {
-                // Prevent duplicate calls using a flag
-                if (!powerUp.HasBeenActivated)
-                {
-                    powerUp.HasBeenActivated = true; // Mark as processed
-                    Debug.Log("powerUpType :" + powerUp.powerUpType.ToString());
-                    //To do it is called twice which causes issue
-                    //ActivatePowerUp(powerUp.powerUpType.ToString());
-                    foodManager.ApplyPowerUpEffect(powerUp.powerUpType);
-                    //foodManager.ActivatePowerUp(powerUp.powerUpType);
-
-                    Destroy(other.gameObject);
-                }
+                Shrink(1);
             }
         }
-        else if (other.gameObject.CompareTag("Obstacle"))
+        else if (powerUp != null)
         {
-            if (!foodManager.GetIsShieldActive())
+            // Prevent duplicate calls using a flag
+            if (!powerUp.HasBeenActivated)
             {
-                ResetState();
+                powerUp.HasBeenActivated = true; // Mark as processed
+                foodManager.ApplyPowerUpEffect(powerUp.powerUpType, this);
+                Destroy(other.gameObject);
+            }
+        }
+        else if (other.gameObject.CompareTag("Obstacle") )
+        {
+            if (!isShieldActive)
+            {
+                GameManager.Instance.DisplayGameOverPanel();
             }
         }
         else if (other.gameObject.CompareTag("Wall"))
@@ -239,9 +212,9 @@ public class SnakeController : MonoBehaviour
             {
                 Traverse(other.transform);
             }
-            else if (!foodManager.GetIsShieldActive())
+            else if (!isShieldActive)
             {
-                ResetState();
+                GameManager.Instance.DisplayGameOverPanel();
             }
         }
     }
@@ -249,7 +222,6 @@ public class SnakeController : MonoBehaviour
     private void Traverse(Transform wall)
     {
         Vector3 position = transform.position;
-
         if (direction.x != 0f)
         {
             position.x = Mathf.RoundToInt(-wall.position.x + direction.x);
@@ -258,7 +230,21 @@ public class SnakeController : MonoBehaviour
         {
             position.y = Mathf.RoundToInt(-wall.position.y + direction.y);
         }
-
         transform.position = position;
     }
+
+    public void SetSpeed(float _speed) { speed = _speed; }
+    public float GetSpeed() { return speed; }
+    public float GetSnakeDefaultSize() { return initialSize; }
+    public float GetDefaultSpeed() { return defaultSpeedMultiplier; }
+    public List<Transform> GetSegmentOfSnakeBodyPartList() { return segmentOfSnakeBodyPartList; }
+    public bool GetIsShieldActive() { return isShieldActive; }
+    public void SetIsShieldActive(bool isActive) {  isShieldActive = isActive; }
+    public bool GetIsScoreBoostActive() { return isScoreBoostActive; }
+    public void SetIsScoreBoostActive(bool isActive) { isScoreBoostActive = isActive; }
+    public bool GetIsSpeedBoostActive() { return isSpeedBoostActive; }
+    public void SetIsSpeedBoostActive(bool isActive) { isSpeedBoostActive = isActive; }
+    public PlayerType GetCurrentSnake() { return PlayerID; }
 }
+
+public enum PlayerType { Snake1, Snake2}

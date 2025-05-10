@@ -10,6 +10,8 @@ TagManager:
   - PowerUp
   - MassGainer
   - MassBurner
+  - Snake1
+  - Snake2
   layers:
   - Default
   - TransparentFX
